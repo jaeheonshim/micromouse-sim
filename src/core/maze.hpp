@@ -15,10 +15,15 @@ struct Maze {
     std::vector<uint8_t> cells;
 
     Maze(int size = 16) : size{ size }, cells{ std::vector<uint8_t>(size * size) } {
-
+        for(int i{ 0 }; i < size; ++i) {
+            at(0, i) |= W;
+            at(size-1, i) |= E;
+            at(i, 0) |= S;
+            at(i, size-1) |= N;
+        }
     }
 
-    uint8_t& at(int x,int y){
+    uint8_t& at(int x, int y){
         return cells[y * size + x];
     }
 
