@@ -101,7 +101,7 @@ int main(int, char**)
         dl->PushClipRect(tl, br, true);
 
         draw_maze(dl, maze, tl, side);
-        draw_mouse(dl, mouse, tl, side);
+        draw_mouse(dl, maze, mouse, tl, side);
 
         ImGui::End();
         ImGui::PopStyleVar();

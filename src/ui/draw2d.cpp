@@ -17,6 +17,8 @@ void draw_maze(ImDrawList* dl, const Maze& maze, ImVec2 tl, float sidePx) {
     }
 }
 
-void draw_mouse(ImDrawList* dl, const Mouse& mouse, ImVec2 tl, float sidePx) {
-    dl->AddCircleFilled(ImVec2(tl.x + mazePaddingPx + mouse.get_pos_x(), tl.y + sidePx - (mazePaddingPx + mouse.get_pos_y())), 5, IM_COL32(255, 0, 0, 255));
+void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl, float sidePx) {
+    float pixelsPerMeter{ sidePx / maze.size / cellWidthM };
+    double xPixelPos{ mouse.get_pos_x() * pixelsPerMeter }, yPixelPos{ mouse.get_pos_y() * pixelsPerMeter };
+    dl->AddCircleFilled(ImVec2(tl.x + mazePaddingPx + xPixelPos, tl.y + sidePx - (mazePaddingPx + yPixelPos)), 5, IM_COL32(255, 0, 0, 255));
 }
