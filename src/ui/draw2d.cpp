@@ -1,4 +1,5 @@
 #include "ui/draw2d.hpp"
+#include <cmath>
 
 void draw_maze(ImDrawList* dl, const Maze& maze, ImVec2 tl, float sidePx) {
     ImVec2 sz{sidePx, sidePx};
@@ -18,7 +19,36 @@ void draw_maze(ImDrawList* dl, const Maze& maze, ImVec2 tl, float sidePx) {
 }
 
 void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl, float sidePx) {
-    float pixelsPerMeter{ sidePx / maze.size / cellWidthM };
-    double xPixelPos{ mouse.get_pos_x() * pixelsPerMeter }, yPixelPos{ mouse.get_pos_y() * pixelsPerMeter };
-    dl->AddCircleFilled(ImVec2(tl.x + mazePaddingPx + xPixelPos, tl.y + sidePx - (mazePaddingPx + yPixelPos)), 5, IM_COL32(255, 0, 0, 255));
+    float pixels_per_meter{ sidePx / maze.size / cellWidthM };
+
+    float mouse_pixel_width{ static_cast<float>(mouse.width * pixels_per_meter) };
+    float mouse_pixel_length{ static_cast<float>(mouse.length * pixels_per_meter) };
+    double x_pixel_pos{ tl.x + mazePaddingPx + mouse.get_pos_x() * pixels_per_meter }, y_pixel_pos{ tl.y + sidePx - (mazePaddingPx + mouse.get_pos_y() * pixels_per_meter) };
+
+    float rect_part_length{ mouse_pixel_length - mouse_pixel_width / 2.0f };
+    float rect_part_y_offset{ mouse_pixel_width / 4.0f };
+
+    ImVec2 points[5] {
+        ImVec2(rect_part_length/2.0f-rect_part_y_offset, -mouse_pixel_width/2.0f), // FL
+        ImVec2(rect_part_length/2.0f-rect_part_y_offset, mouse_pixel_width/2.0f), // FR
+        ImVec2(-(rect_part_length/2.0f+rect_part_y_offset), -mouse_pixel_width/2.0f), // BL
+        ImVec2(-(rect_part_length/2.0f+rect_part_y_offset), +mouse_pixel_width/2.0f), // BR
+        ImVec2(rect_part_length / 2.0f - rect_part_y_offset, 0.0f) // Circle part center
+    };
+
+    // Apply rotation and transform into absolute coordinates
+
+    float angle = mouse.get_heading();
+    float cosA = cosf(angle);
+    float sinA = sinf(angle);
+
+    for (int i = 0; i < 5; i++) {
+        float x = points[i].x;
+        float y = points[i].y;
+        points[i].x = x * cosA - y * sinA + x_pixel_pos;
+        points[i].y = -(x * sinA + y * cosA) + y_pixel_pos;
+    }
+
+    dl->AddQuadFilled(points[0], points[1], points[3], points[2], IM_COL32(0, 0, 255, 255));
+    dl->AddCircleFilled(points[4], mouse_pixel_width / 2.0f, IM_COL32(0, 0, 255, 255));
 }

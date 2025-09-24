@@ -4,6 +4,9 @@
 #include "core/maze.hpp"
 #include "core/mouse.hpp"
 
+constexpr float mouseWidth{ 20 };
+constexpr float mouseLength{ 20 };
+
 constexpr float cellWidthM{ 0.18 };
 constexpr float mazePaddingPx{ 16 };
 constexpr float wallWidthPx{ 2 };

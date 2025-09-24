@@ -4,18 +4,17 @@
 #include "core/types.hpp"
 
 // Represents the physical state of a micromouse within the world
-class Mouse {
-  Pose pose{};
-
+struct Mouse {
   double width{ 0.05 };
+  double length{ 0.05 };
   double wheel_radius{ 0.02 };
+
+  Pose pose{};
 
   // velocities of the wheels
   double w_l{ 0 };
   double w_r{ 0 };
 
-  
-public:
   void step(double dt);
 
   double get_pos_x() const {
