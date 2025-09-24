@@ -11,6 +11,7 @@
 
 #include "ui/draw2d.hpp"
 #include "ui/control.hpp"
+#include "ui/windows.hpp"
 #include "core/mouse.hpp"
 
 static void glfw_error_callback(int error, const char* description)
@@ -56,9 +57,11 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    Maze maze;
-    Mouse mouse;
-    ManualControlConfig control_config;
+    Maze maze{};
+    Mouse mouse{};
+
+    ManualWheelDriveAccum control_accum{};
+    ManualControlConfig control_config{};
 
     while (!glfwWindowShouldClose(window))
     {
@@ -73,6 +76,15 @@ int main(int, char**)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        float dt{ ImGui::GetIO().DeltaTime };
+
+        if(control_config.enabled) {
+            GetWheelCommandsFromKeys(control_accum, control_config, dt);
+            mouse.set_wheels_vel(control_accum.left, control_accum.right);
+        }
+
+        mouse.step(dt);
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::Begin("Maze");
@@ -95,6 +107,7 @@ int main(int, char**)
         ImGui::PopStyleVar();
 
         DrawControlUi(control_config);
+        DrawMouseWindow(mouse);
 
         // Rendering
         ImGui::Render();
