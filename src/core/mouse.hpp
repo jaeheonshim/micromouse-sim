@@ -1,5 +1,4 @@
-#ifndef MOUSE_H
-#define MOUSE_H
+#pragma once
 
 #include <vector>
 #include "core/types.hpp"
@@ -16,6 +15,13 @@ class Mouse {
   double w_r;
 
   void step(double dt);
-};
 
-#endif
+public:
+  double get_pos_x() const {
+    return pose.x;
+  }
+
+  double get_pos_y() const {
+    return pose.y;
+  }
+};

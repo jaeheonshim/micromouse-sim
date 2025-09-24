@@ -1,5 +1,4 @@
-#ifndef MAZE_H
-#define MAZE_H
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -27,5 +26,3 @@ struct Maze {
         return cells[y * size + x];
     }
 };
-
-#endif

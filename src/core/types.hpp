@@ -1,5 +1,4 @@
-#ifndef TYPES_H
-#define TYPES_H
+#pragma once
 
 struct Pose {
   double x{0}, y{0}, th{0.0};
@@ -8,5 +7,3 @@ struct Pose {
 struct Twist {
   double vx{0.0}, vy{0.0}, wz{0.0};
 };
-
-#endif
