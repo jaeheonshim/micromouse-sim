@@ -12,9 +12,9 @@ struct ManualControlConfig {
     ImGuiKey right_dec{ ImGuiKey_K };
     ImGuiKey stop_all{ ImGuiKey_Space };
 
-    double max_vel{ 10 };
-    double vel_ramp{ 1 };
-    double vel_decay{ 1 };
+    double max_vel{ 30 };
+    double vel_ramp{ 60 };
+    double vel_decay{ 60 };
 };
 
 struct ManualWheelDriveAccum {

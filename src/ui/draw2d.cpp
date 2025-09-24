@@ -33,7 +33,7 @@ void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl,
         ImVec2(rect_part_length/2.0f-rect_part_y_offset, mouse_pixel_width/2.0f), // FR
         ImVec2(-(rect_part_length/2.0f+rect_part_y_offset), -mouse_pixel_width/2.0f), // BL
         ImVec2(-(rect_part_length/2.0f+rect_part_y_offset), +mouse_pixel_width/2.0f), // BR
-        ImVec2(rect_part_length / 2.0f - rect_part_y_offset, 0.0f) // Circle part center
+        ImVec2(rect_part_length / 2.0f - rect_part_y_offset, 0.0f)
     };
 
     // Apply rotation and transform into absolute coordinates
@@ -50,5 +50,5 @@ void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl,
     }
 
     dl->AddQuadFilled(points[0], points[1], points[3], points[2], IM_COL32(0, 0, 255, 255));
-    dl->AddCircleFilled(points[4], mouse_pixel_width / 2.0f, IM_COL32(0, 0, 255, 255));
+    dl->AddCircleFilled(points[4], mouse_pixel_width / 2.0f + 0.5f, IM_COL32(0, 0, 255, 255));
 }

@@ -2,14 +2,15 @@
 
 #include <vector>
 #include "core/types.hpp"
+#include <cmath>
 
 // Represents the physical state of a micromouse within the world
 struct Mouse {
-  double width{ 0.05 };
-  double length{ 0.05 };
+  double width{ 0.08 };
+  double length{ 0.1 };
   double wheel_radius{ 0.02 };
 
-  Pose pose{};
+  Pose pose{ 0.09, 0.09, M_PI / 2 };
 
   // velocities of the wheels
   double w_l{ 0 };
