@@ -1,49 +1,98 @@
 #include "ui/draw2d.hpp"
 #include "core/maze.hpp"
 #include <cmath>
+#include <algorithm>
+#include <iostream>
+
+ImVec2 snap(ImVec2 p) {
+    p.x = floorf(p.x) + 0.5f;
+    p.y = floorf(p.y) + 0.5f;
+    return p;
+};
+
+void draw_wall(ImDrawList* dl, float wall_width_px, const ImVec2& a, const ImVec2& b) {
+    // just handle both cases
+
+    if(b.y > a.y) {
+        dl->AddQuadFilled(
+            snap(ImVec2(a.x - wall_width_px / 2, a.y - wall_width_px / 2)),
+            snap(ImVec2(a.x + wall_width_px / 2, a.y - wall_width_px / 2)),
+            snap(ImVec2(b.x + wall_width_px / 2, b.y + wall_width_px / 2)),
+            snap(ImVec2(b.x - wall_width_px / 2, b.y + wall_width_px / 2)),
+            IM_COL32(255, 0, 0, 255)
+        );
+    } else {
+        dl->AddQuadFilled(
+            snap(ImVec2(a.x - wall_width_px / 2, a.y - wall_width_px / 2)),
+            snap(ImVec2(a.x - wall_width_px / 2, a.y + wall_width_px / 2)),
+            snap(ImVec2(b.x + wall_width_px / 2, b.y + wall_width_px / 2)),
+            snap(ImVec2(b.x + wall_width_px / 2, b.y - wall_width_px / 2)),
+            IM_COL32(255, 0, 0, 255)
+        );
+    }
+};
+
+bool handle_maze_clicks(ImDrawList* dl, const Maze& maze, ImVec2 tl, float side_px) {
+    const float pixels_per_meter = side_px / maze.size / cellWidthM;
+
+    const float cell_px = (side_px - mazePaddingPx * 2.0f) / maze.size;
+    const float wall_width_px = wallWidthM * pixels_per_meter;
+
+    ImVec2 mouse = ImGui::GetIO().MousePos;
+    ImVec2 local(mouse.x - tl.x, mouse.y - tl.y);
+
+    const float hit = cell_px / 2.0f;
+
+    const float gx{ local.x - mazePaddingPx };
+    const float gy{ local.y - mazePaddingPx };
+
+    if (gx < 0 || gy < 0 || gx > maze.size * cell_px || gy > maze.size * cell_px) return false; // outside of maze
+
+    // horizontal walls
+    const int horiz_r{ (int)std::clamp(std::round(gy / cell_px), 0.0f, (float)maze.size) };
+    const int horiz_c{ (int)std::clamp(std::floor(gx / cell_px), 0.0f, (float)maze.size) };
+
+    // vertical
+    const int vert_r{ (int)std::clamp(std::floor(gy / cell_px), 0.0f, (float)maze.size) };
+    const int vert_c{ (int)std::clamp(std::round(gx / cell_px), 0.0f, (float)maze.size) };
+
+    const bool downL = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+
+    float horiz_d{ std::abs(gx - (horiz_c + 0.5f) * cell_px) };
+    float vert_d{ std::abs(gy - (vert_r + 0.5f) * cell_px) };
+
+    ImVec2 horiz_wall[2] = {
+        ImVec2(tl.x + mazePaddingPx + horiz_c * cell_px, tl.y + mazePaddingPx + horiz_r * cell_px),
+        ImVec2(tl.x + mazePaddingPx + horiz_c * cell_px + cell_px, tl.y + mazePaddingPx + horiz_r * cell_px),
+    };
+
+    ImVec2 vert_wall[2] = {
+        ImVec2(tl.x + mazePaddingPx + vert_c * cell_px, tl.y + mazePaddingPx + vert_r * cell_px),
+        ImVec2(tl.x + mazePaddingPx + vert_c * cell_px, tl.y + mazePaddingPx + vert_r * cell_px + cell_px),
+    };
+
+    float thresh{ cell_px * 0.25f };
+
+    if(horiz_d < thresh || vert_d < thresh) {
+        if(horiz_d < vert_d) {
+            draw_wall(dl, wall_width_px, horiz_wall[0], horiz_wall[1]);
+        } else {
+            draw_wall(dl, wall_width_px, vert_wall[0], vert_wall[1]);
+        }
+    }
+}
 
 void draw_maze(ImDrawList* dl, const Maze& maze, ImVec2 tl, float sidePx) {
     float pixels_per_meter{ sidePx / maze.size / cellWidthM };
 
-    ImVec2 sz{sidePx, sidePx};
-    dl->AddRectFilled(tl, ImVec2(tl.x + sz.x, tl.y + sz.y), IM_COL32(25, 25, 30, 255), 6.0f);
+    handle_maze_clicks(dl, maze, tl, sidePx);
 
     float cellWidth{ (sidePx - mazePaddingPx * 2) / maze.size };
-    float wall_width_px{  wallWidthM * pixels_per_meter };
-
-    auto snap = [](ImVec2 p) {
-        p.x = floorf(p.x) + 0.5f;
-        p.y = floorf(p.y) + 0.5f;
-        return p;
-    };
-
+    float wall_width_px{ wallWidthM * pixels_per_meter };
 
     auto draw_point = [&](const ImVec2& vec) {
         dl->AddRectFilled(snap(ImVec2(vec.x - wall_width_px / 2, vec.y - wall_width_px / 2)), snap(ImVec2(vec.x + wall_width_px / 2, vec.y + wall_width_px / 2)), IM_COL32(255, 255, 255, 255), 0.0f);
     };
-
-    auto draw_wall = [&](const ImVec2& a, const ImVec2& b) {
-        // just handle both cases
-
-        if(b.y > a.y) {
-            dl->AddQuadFilled(
-                snap(ImVec2(a.x - wall_width_px / 2, a.y - wall_width_px / 2)),
-                snap(ImVec2(a.x + wall_width_px / 2, a.y - wall_width_px / 2)),
-                snap(ImVec2(b.x + wall_width_px / 2, b.y + wall_width_px / 2)),
-                snap(ImVec2(b.x - wall_width_px / 2, b.y + wall_width_px / 2)),
-                IM_COL32(255, 0, 0, 255)
-            );
-        } else {
-            dl->AddQuadFilled(
-                snap(ImVec2(a.x - wall_width_px / 2, a.y - wall_width_px / 2)),
-                snap(ImVec2(a.x - wall_width_px / 2, a.y + wall_width_px / 2)),
-                snap(ImVec2(b.x + wall_width_px / 2, b.y + wall_width_px / 2)),
-                snap(ImVec2(b.x + wall_width_px / 2, b.y - wall_width_px / 2)),
-                IM_COL32(255, 0, 0, 255)
-            );
-        }
-    };
-
 
     for(int y{ 0 }; y < maze.size; ++y) {
         for(int x{ 0 }; x < maze.size; ++x) {
@@ -55,10 +104,10 @@ void draw_maze(ImDrawList* dl, const Maze& maze, ImVec2 tl, float sidePx) {
             ImVec2 wall_bl(tl.x + cellX, tl.y + cellY);
             ImVec2 wall_br(tl.x + cellX + cellWidth, tl.y + cellY);
 
-            if(cell & N) draw_wall(wall_tl, wall_tr);
-            if(cell & E) draw_wall(wall_br, wall_tr);
-            if(cell & S) draw_wall(wall_bl, wall_br);
-            if(cell & W) draw_wall(wall_bl, wall_tl);
+            if(cell & N) draw_wall(dl, wall_width_px, wall_tl, wall_tr);
+            if(cell & E) draw_wall(dl, wall_width_px, wall_br, wall_tr);
+            if(cell & S) draw_wall(dl, wall_width_px, wall_bl, wall_br);
+            if(cell & W) draw_wall(dl, wall_width_px, wall_bl, wall_tl);
 
             draw_point(wall_tl);
             draw_point(wall_tr);
