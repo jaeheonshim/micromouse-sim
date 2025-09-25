@@ -100,7 +100,10 @@ void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl,
     }
 
     dl->AddQuadFilled(points[0], points[1], points[3], points[2], IM_COL32(0, 0, 255, 255));
-    dl->AddCircleFilled(points[4], mouse_pixel_width / 2.0f + 0.5f, IM_COL32(0, 0, 255, 255));
+    dl->AddCircleFilled(points[4], mouse_pixel_width / 2.0f + 0.5f, IM_COL32(0, 0, 255, 255));    
+}
 
-    
+void draw_world(ImDrawList* dl, const World& world, ImVec2 tl, float sidePx) {
+    draw_maze(dl, world.maze, tl, sidePx);
+    draw_mouse(dl, world.maze, world.mouse, tl, sidePx);
 }

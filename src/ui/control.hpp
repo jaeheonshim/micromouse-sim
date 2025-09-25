@@ -94,6 +94,8 @@ inline void DrawControlUi(ManualControlConfig& config) {
     ImGui::SeparatorText("Parameters");
     double step{ 0.1 };
     ImGui::InputScalar("Max wheel speed (rad/s)", ImGuiDataType_Double, &config.max_vel, &step, nullptr, "%.2f");
+    ImGui::InputScalar("Wheel accel (rad/s/s)", ImGuiDataType_Double, &config.vel_ramp, &step, nullptr, "%.2f");
+    ImGui::InputScalar("Wheel decay (rad/s/s)", ImGuiDataType_Double, &config.vel_decay, &step, nullptr, "%.2f");
 
     ImGui::SeparatorText("Key Bindings");
     ImGui::TextUnformatted("Left wheel");

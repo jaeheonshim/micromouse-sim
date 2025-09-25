@@ -22,6 +22,7 @@ file(GLOB IMGUI_SRC
 add_executable(micromouse_sim
     src/main.cpp
     src/core/mouse.cpp
+    src/core/world.cpp
     src/ui/draw2d.cpp
     ${IMGUI_SRC}
 )

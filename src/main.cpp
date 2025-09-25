@@ -30,7 +30,7 @@ int main(int, char**)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
-    GLFWwindow* window = glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale), "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow((int)(1280 * main_scale), (int)(800 * main_scale), "Micromouse Simulator", nullptr, nullptr);
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
@@ -57,8 +57,7 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    Maze maze{};
-    Mouse mouse{};
+    World world{};
 
     ManualWheelDriveAccum control_accum{};
     ManualControlConfig control_config{};
@@ -81,10 +80,10 @@ int main(int, char**)
 
         if(control_config.enabled) {
             GetWheelCommandsFromKeys(control_accum, control_config, dt);
-            mouse.set_wheels_vel(control_accum.left, control_accum.right);
+            world.mouse.set_wheels_vel(control_accum.left, control_accum.right);
         }
 
-        mouse.step(dt);
+        world.step(dt);
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::Begin("Maze");
@@ -100,14 +99,13 @@ int main(int, char**)
         ImDrawList* dl = ImGui::GetWindowDrawList();
         dl->PushClipRect(tl, br, true);
 
-        draw_maze(dl, maze, tl, side);
-        draw_mouse(dl, maze, mouse, tl, side);
+        draw_world(dl, world, tl, side);
 
         ImGui::End();
         ImGui::PopStyleVar();
 
         DrawControlUi(control_config);
-        DrawMouseWindow(mouse);
+        DrawMouseWindow(world.mouse);
 
         // Rendering
         ImGui::Render();
