@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "types.hpp"
 
 enum : uint8_t {
     N = 1<<0,
