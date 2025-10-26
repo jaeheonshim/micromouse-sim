@@ -67,26 +67,35 @@ target_include_directories(micromouse_sim PRIVATE
 target_link_libraries(micromouse_sim PRIVATE nfd)
 
 if (WIN32)
-    message(STATUS "Building for Windows (DX11 + Win32)")
+  message(STATUS "Building for Windows (DX11 + Win32)")
 
-    target_sources(micromouse_sim PRIVATE
-        ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_win32.cpp
-        ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_dx11.cpp
-    )
+  target_sources(micromouse_sim PRIVATE
+    ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_win32.cpp
+    ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_dx11.cpp
+  )
 
-    # DirectX libraries
+  # ---- Link libraries ----
+  if (MINGW)  # MSYS2/MinGW toolchains
     target_link_libraries(micromouse_sim PRIVATE
-        d3d11
-        dxgi
-        d3dcompiler
+      d3d11 dxgi d3dcompiler
+      dwmapi      # <- fixes __imp_Dwm* unresolved symbols
+      imm32       # IME used by ImGui_ImplWin32
+      user32 gdi32 shell32 ole32 oleaut32 uuid setupapi winmm
     )
+  else()       # MSVC
+    target_link_libraries(micromouse_sim PRIVATE
+      d3d11 dxgi d3dcompiler
+      dwmapi      # <- fixes __imp_Dwm* unresolved symbols
+      imm32
+    )
+  endif()
 
-    # For a WinMain() entry point (no console window):
-    set_property(TARGET micromouse_sim PROPERTY WIN32_EXECUTABLE TRUE)
+  # Use WinMain and hide console window:
+  set_property(TARGET micromouse_sim PROPERTY WIN32_EXECUTABLE TRUE)
 
-    if (MSVC)
-        target_compile_options(micromouse_sim PRIVATE /W4 /MP)
-    endif()
+  if (MSVC)
+    target_compile_options(micromouse_sim PRIVATE /W4 /MP)
+  endif()
 
 else()
     message(STATUS "Building for Linux (GLFW + OpenGL3)")
