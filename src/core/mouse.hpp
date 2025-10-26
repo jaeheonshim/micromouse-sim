@@ -12,6 +12,8 @@ struct Mouse {
 
   Pose pose{ 0.09, 0.09, M_PI / 2 };
 
+  std::vector<Pose> sensors{{0, 0, 0}};
+
   // velocities of the wheels
   double w_l{ 0 };
   double w_r{ 0 };
