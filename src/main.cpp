@@ -342,6 +342,8 @@ int main(int, char**)
 
         DrawControlUi(control_config);
         DrawMouseWindow(world.mouse);
+        DrawWorldWindow(world);
+        DrawMenuBar(world);
 
         // Rendering
         ImGui::Render();
