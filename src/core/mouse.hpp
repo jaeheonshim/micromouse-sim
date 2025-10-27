@@ -10,6 +10,7 @@ struct Mouse {
   double length{ 0.1 };
   double wheel_radius{ 0.02 };
 
+  bool showRaycast; 
 
   Pose pose{ 0.09, 0.09, M_PI / 2 };
 

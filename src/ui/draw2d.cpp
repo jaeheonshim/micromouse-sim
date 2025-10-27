@@ -87,7 +87,7 @@ bool handle_maze_clicks(ImDrawList* dl, const Maze& maze, ImVec2 tl, float side_
     }
 }
 
-void draw_maze(ImDrawList* dl, const Maze& maze, ImVec2 tl, float side_px) {
+void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, float side_px) {
     pixels_per_meter = side_px / maze.size / cellWidthM;
     cell_px = (side_px - mazePaddingPx * 2.0f) / maze.size;
     wall_width_px = wallWidthM * pixels_per_meter;
@@ -96,6 +96,12 @@ void draw_maze(ImDrawList* dl, const Maze& maze, ImVec2 tl, float side_px) {
 
     auto draw_point = [&](const ImVec2& vec) {
         dl->AddRectFilled(snap(ImVec2(vec.x - wall_width_px / 2, vec.y - wall_width_px / 2)), snap(ImVec2(vec.x + wall_width_px / 2, vec.y + wall_width_px / 2)), IM_COL32(255, 255, 255, 255), 0.0f);
+    };
+    auto world_to_screen = [&](float wx, float wy)
+    {
+        float x_px = tl.x + mazePaddingPx + wx * pixels_per_meter;
+        float y_px = tl.y + mazePaddingPx + (maze.size * cellWidthM - wy) * pixels_per_meter;
+        return ImVec2(x_px, y_px);
     };
 
     for(int y{ 0 }; y < maze.size; ++y) {
@@ -119,6 +125,14 @@ void draw_maze(ImDrawList* dl, const Maze& maze, ImVec2 tl, float side_px) {
             draw_point(wall_br);
         }
     }
+    if (mouse.showRaycast) {
+        ImVec2 ray_start = world_to_screen(mouse.get_pos_x(), mouse.get_pos_y());
+        ImVec2 ray_end = world_to_screen(mouse.sensorReadings[0].x, mouse.sensorReadings[0].y);
+
+        dl->AddLine(ray_start, ray_end, IM_COL32(255, 0, 0, 255), 2.0f);
+        dl->AddCircleFilled(ray_end, 3.0f, IM_COL32(255, 100, 100, 255));
+    }
+   
 }
 
 void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl, float sidePx) {
@@ -156,6 +170,6 @@ void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl,
 }
 
 void draw_world(ImDrawList* dl, const World& world, ImVec2 tl, float sidePx) {
-    draw_maze(dl, world.maze, tl, sidePx);
+    draw_maze(dl, world.maze, world.mouse, tl, sidePx);
     draw_mouse(dl, world.maze, world.mouse, tl, sidePx);
 }
