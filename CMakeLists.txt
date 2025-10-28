@@ -64,59 +64,77 @@ target_include_directories(micromouse_sim PRIVATE
     ${CMAKE_SOURCE_DIR}/imgui/backends
 )
 
-target_link_libraries(micromouse_sim PRIVATE nfd)
+# =========================
+# Platform-specific setup
+# =========================
 
 if (WIN32)
   message(STATUS "Building for Windows (DX11 + Win32)")
 
   target_sources(micromouse_sim PRIVATE
-    ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_win32.cpp
-    ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_dx11.cpp
+      ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_win32.cpp
+      ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_dx11.cpp
   )
 
-  # ---- Link libraries ----
-  if (MINGW)  # MSYS2/MinGW toolchains
+  if (MINGW)
     target_link_libraries(micromouse_sim PRIVATE
-      d3d11 dxgi d3dcompiler
-      dwmapi      # <- fixes __imp_Dwm* unresolved symbols
-      imm32       # IME used by ImGui_ImplWin32
-      user32 gdi32 shell32 ole32 oleaut32 uuid setupapi winmm
+        d3d11 dxgi d3dcompiler dwmapi imm32
+        user32 gdi32 shell32 ole32 oleaut32 uuid setupapi winmm
     )
-  else()       # MSVC
+  else()
     target_link_libraries(micromouse_sim PRIVATE
-      d3d11 dxgi d3dcompiler
-      dwmapi      # <- fixes __imp_Dwm* unresolved symbols
-      imm32
+        d3d11 dxgi d3dcompiler dwmapi imm32
     )
   endif()
 
-  # Use WinMain and hide console window:
   set_property(TARGET micromouse_sim PROPERTY WIN32_EXECUTABLE TRUE)
 
   if (MSVC)
     target_compile_options(micromouse_sim PRIVATE /W4 /MP)
   endif()
 
-else()
-    message(STATUS "Building for Linux (GLFW + OpenGL3)")
+elseif(APPLE)
+  message(STATUS "Building for macOS (GLFW + OpenGL3)")
 
-    find_package(OpenGL REQUIRED)
-    find_package(glfw3 REQUIRED)
+  find_package(OpenGL REQUIRED)
+  find_package(glfw3 REQUIRED)
 
-    target_sources(micromouse_sim PRIVATE
-        ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_glfw.cpp
-        ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_opengl3.cpp
-    )
+  target_sources(micromouse_sim PRIVATE
+      ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_glfw.cpp
+      ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_opengl3.cpp
+  )
 
-    # Use GLFW’s loader (no GLAD or gl3w)
-    target_compile_definitions(micromouse_sim PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLFW)
+  target_compile_definitions(micromouse_sim PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLFW)
 
-    target_link_libraries(micromouse_sim PRIVATE
-        glfw
-        OpenGL::GL
-    )
+  target_link_libraries(micromouse_sim PRIVATE
+      glfw
+      OpenGL::GL
+      "-framework Cocoa"
+      "-framework IOKit"
+      "-framework CoreVideo"
+  )
 
-    target_compile_options(micromouse_sim PRIVATE -Wall -Wextra -Wpedantic)
+  target_compile_options(micromouse_sim PRIVATE -Wall -Wextra -Wpedantic)
+
+else() # Linux or other UNIX
+  message(STATUS "Building for Linux (GLFW + OpenGL3)")
+
+  find_package(OpenGL REQUIRED)
+  find_package(glfw3 REQUIRED)
+
+  target_sources(micromouse_sim PRIVATE
+      ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_glfw.cpp
+      ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_opengl3.cpp
+  )
+
+  target_compile_definitions(micromouse_sim PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLFW)
+
+  target_link_libraries(micromouse_sim PRIVATE
+      glfw
+      OpenGL::GL
+  )
+
+  target_compile_options(micromouse_sim PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 enable_testing()
