@@ -10,7 +10,9 @@ inline void DrawMouseWindow(Mouse& mouse) {
     ImGui::Text("Raycast x=%.3f, y=%.3f", mouse.sensorReadings[0].x, mouse.sensorReadings[0].y);
     ImGui::SeparatorText("Parameters");
     ImGui::Checkbox("Show Raycast", &mouse.showRaycast);
-    double step{ 0.01 }; // centimeter
+    ImGui::SeparatorText("Distance");
+    ImGui::Text("Distance sensor 0 distance=%.3f", mouse.get_distance_sensor(0));
+    double step{0.01}; // centimeter
     ImGui::InputScalar("Width (m)", ImGuiDataType_Double, &mouse.width, &step, nullptr, "%.3f");
     ImGui::InputScalar("Length (m)", ImGuiDataType_Double, &mouse.length, &step, nullptr, "%.3f");
     ImGui::InputScalar("Wheel Radius (m)", ImGuiDataType_Double, &mouse.wheel_radius, &step, nullptr, "%.3f");

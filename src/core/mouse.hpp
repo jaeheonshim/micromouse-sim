@@ -29,10 +29,14 @@ struct Mouse {
 
   double get_pos_y() const {
     return pose.y;
-  }
+  } 
 
   double get_heading() const {
     return pose.th;
+  }
+
+  double get_distance_sensor(double sensorNum) const {
+    return std::sqrt(std::pow(sensorReadings[sensorNum].x - pose.x, 2) + std::pow(sensorReadings[sensorNum].y - pose.y, 2)); // Should return distance
   }
 
   void set_wheels_vel(double w_l, double w_r) {
