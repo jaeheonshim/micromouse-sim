@@ -105,49 +105,14 @@ void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, 
         return ImVec2(x_px, y_px);
     };
 
-    for(int y{ 0 }; y < maze.size; ++y) {
-        for(int x{ 0 }; x < maze.size; ++x) {
-            float cellX{ mazePaddingPx + x * cell_px }, cellY{ mazePaddingPx + y * cell_px };
-            const uint8_t cell{ maze.at(x, y) };
-
-            ImVec2 wall_tl(tl.x + cellX, tl.y + cellY + cell_px);
-            ImVec2 wall_tr(tl.x + cellX + cell_px, tl.y + cellY + cell_px);
-            ImVec2 wall_bl(tl.x + cellX, tl.y + cellY);
-            ImVec2 wall_br(tl.x + cellX + cell_px, tl.y + cellY);
-
-            if(cell & N) draw_wall(dl, wall_width_px, wall_tl, wall_tr);
-            if(cell & E) draw_wall(dl, wall_width_px, wall_br, wall_tr);
-            if(cell & S) draw_wall(dl, wall_width_px, wall_bl, wall_br);
-            if(cell & W) draw_wall(dl, wall_width_px, wall_bl, wall_tl);
-
-            draw_point(wall_tl);
-            draw_point(wall_tr);
-            draw_point(wall_bl);
-            draw_point(wall_br);
-        }
-    }
-    if (mouse.showRaycast) {
-        ImVec2 ray_start = world_to_screen(mouse.get_pos_x(), mouse.get_pos_y());
-        ImVec2 ray_end = {0,0};
-        if (mouse.sensorReadings.size() > 0){
-            ray_end = world_to_screen(mouse.sensorReadings[0].x, mouse.sensorReadings[0].y);
-        }
-
-        dl->AddLine(ray_start, ray_end, IM_COL32(255, 0, 0, 255), 2.0f);
-        dl->AddCircleFilled(ray_end, 3.0f, IM_COL32(255, 100, 100, 255));
-    }
-   
-}
-
-void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl, float sidePx) {
-    pixels_per_meter = sidePx / maze.size / cellWidthM;
 
     float mouse_pixel_width{ static_cast<float>(mouse.width * pixels_per_meter) };
     float mouse_pixel_length{ static_cast<float>(mouse.length * pixels_per_meter) };
-    double x_pixel_pos{ tl.x + mazePaddingPx + mouse.get_pos_x() * pixels_per_meter }, y_pixel_pos{ tl.y + sidePx - (mazePaddingPx + mouse.get_pos_y() * pixels_per_meter) };
 
     float rect_part_length{ mouse_pixel_length - mouse_pixel_width / 2.0f };
     float rect_part_y_offset{ mouse_pixel_width / 4.0f };
+    ImVec2 mouse_pos = world_to_screen(mouse.get_pos_x(), mouse.get_pos_y());
+    double x_pixel_pos = mouse_pos.x, y_pixel_pos = mouse_pos.y;
 
     ImVec2 points[5] {
         ImVec2(rect_part_length/2.0f-rect_part_y_offset, -mouse_pixel_width/2.0f), // FL
@@ -170,10 +135,41 @@ void draw_mouse(ImDrawList* dl, const Maze& maze, const Mouse& mouse, ImVec2 tl,
     }
 
     dl->AddQuadFilled(points[0], points[1], points[3], points[2], IM_COL32(0, 0, 255, 255));
-    dl->AddCircleFilled(points[4], mouse_pixel_width / 2.0f + 0.5f, IM_COL32(0, 0, 255, 255));    
+    dl->AddCircleFilled(points[4], mouse_pixel_width / 2.0f + 0.5f, IM_COL32(0, 0, 255, 255));
+
+    for(int y{ 0 }; y < maze.size; ++y) {
+        for(int x{ 0 }; x < maze.size; ++x) {
+            float cellX{ mazePaddingPx + x * cell_px }, cellY{ mazePaddingPx + y * cell_px };
+            const uint8_t cell{ maze.at(x, y) };
+
+            ImVec2 wall_tl(tl.x + cellX, tl.y + cellY + cell_px);
+            ImVec2 wall_tr(tl.x + cellX + cell_px, tl.y + cellY + cell_px);
+            ImVec2 wall_bl(tl.x + cellX, tl.y + cellY);
+            ImVec2 wall_br(tl.x + cellX + cell_px, tl.y + cellY);
+
+            if(cell & N) draw_wall(dl, wall_width_px, wall_tl, wall_tr);
+            if(cell & E) draw_wall(dl, wall_width_px, wall_br, wall_tr);
+            if(cell & S) draw_wall(dl, wall_width_px, wall_bl, wall_br);
+            if(cell & W) draw_wall(dl, wall_width_px, wall_bl, wall_tl);
+
+            draw_point(wall_tl);
+            draw_point(wall_tr);
+            draw_point(wall_bl);
+            draw_point(wall_br);
+        }
+    }
+    if (mouse.showRaycast) {
+        ImVec2 ray_end = {0,0};
+        if (mouse.sensorReadings.size() > 0){
+            ray_end = world_to_screen(mouse.sensorReadings[0].x, mouse.sensorReadings[0].y);
+        }
+
+        dl->AddLine(mouse_pos, ray_end, IM_COL32(255, 0, 0, 255), 2.0f);
+        dl->AddCircleFilled(ray_end, 3.0f, IM_COL32(255, 100, 100, 255));
+    }
+   
 }
 
 void draw_world(ImDrawList* dl, const World& world, ImVec2 tl, float sidePx) {
     draw_maze(dl, world.maze, world.mouse, tl, sidePx);
-    draw_mouse(dl, world.maze, world.mouse, tl, sidePx);
 }
