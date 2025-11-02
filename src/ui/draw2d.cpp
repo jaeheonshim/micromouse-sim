@@ -85,6 +85,7 @@ bool handle_maze_clicks(ImDrawList* dl, const Maze& maze, ImVec2 tl, float side_
             draw_wall(dl, wall_width_px, vert_wall[0], vert_wall[1], IM_COL32(255, 0, 0, 100));
         }
     }
+    return true;
 }
 
 void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, float side_px) {
@@ -127,7 +128,10 @@ void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, 
     }
     if (mouse.showRaycast) {
         ImVec2 ray_start = world_to_screen(mouse.get_pos_x(), mouse.get_pos_y());
-        ImVec2 ray_end = world_to_screen(mouse.sensorReadings[0].x, mouse.sensorReadings[0].y);
+        ImVec2 ray_end = {0,0};
+        if (mouse.sensorReadings.size() > 0){
+            ray_end = world_to_screen(mouse.sensorReadings[0].x, mouse.sensorReadings[0].y);
+        }
 
         dl->AddLine(ray_start, ray_end, IM_COL32(255, 0, 0, 255), 2.0f);
         dl->AddCircleFilled(ray_end, 3.0f, IM_COL32(255, 100, 100, 255));

@@ -35,9 +35,11 @@ struct Mouse {
     return pose.th;
   }
 
-  double get_distance_sensor(double sensorNum) const {
-    return std::sqrt(std::pow(sensorReadings[sensorNum].x - pose.x, 2) + std::pow(sensorReadings[sensorNum].y - pose.y, 2)); // Should return distance
-  }
+double get_distance_sensor(size_t sensorNum) const {
+    if (sensorNum >= sensorReadings.size()) return 0.0;
+    const auto& s = sensorReadings[sensorNum];
+    return std::sqrt((s.x - pose.x) * (s.x - pose.x) + (s.y - pose.y) * (s.y - pose.y));
+}
 
   void set_wheels_vel(double w_l, double w_r) {
     this->w_l = w_l;
