@@ -23,7 +23,7 @@ void set_wall(Maze& maze, int wall_r, int wall_c) {
 void draw_wall(ImDrawList* dl, float wall_width_px, const ImVec2& a, const ImVec2& b, const ImU32 color = IM_COL32(255, 0, 0, 255)) {
     // just handle both cases
 
-    if(b.y > a.y) {
+    if(b.y != a.y) {
         dl->AddQuadFilled(
             snap(ImVec2(a.x - wall_width_px / 2, a.y - wall_width_px / 2)),
             snap(ImVec2(a.x + wall_width_px / 2, a.y - wall_width_px / 2)),
@@ -101,7 +101,7 @@ void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, 
     auto world_to_screen = [&](float wx, float wy)
     {
         float x_px = tl.x + mazePaddingPx + wx * pixels_per_meter;
-        float y_px = tl.y + mazePaddingPx + (maze.size * cellWidthM - wy) * pixels_per_meter;
+        float y_px = -mazePaddingPx + tl.y + (16 * cellWidthM - wy) * pixels_per_meter;
         return ImVec2(x_px, y_px);
     };
 

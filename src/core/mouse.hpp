@@ -12,7 +12,7 @@ struct Mouse {
 
   bool showRaycast{false}; 
 
-  Pose pose{ 0.09, 0.09*3, M_PI / 2 };
+  Pose pose{ 0.09, 0.09, M_PI / 2 };
 
   std::vector<Pose> sensors{{0, 0, 0}};
   std::vector<Pose> sensorReadings{};
