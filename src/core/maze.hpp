@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include "types.hpp"
-
+#include <cmath>
 enum : uint8_t {
     N = 1<<0,
     E = 1<<1,
