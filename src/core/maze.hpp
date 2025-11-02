@@ -23,6 +23,7 @@ struct Maze {
                 at(i, 0) |= S;
                 at(i, size-1) |= N;
             }
+            at(1,2) |= N;
         }
     }
     bool has_wall(int cx, int cy, uint8_t side) const {
@@ -42,10 +43,7 @@ struct Maze {
         constexpr double EPS = 1e-9;
         double x = origin.x, y = origin.y;
         double dx = std::cos(origin.th), dy = std::sin(origin.th);
-        if (std::abs(dx) < EPS && std::abs(dy) < EPS) return {x, y, 0.0};
-        x += EPS * dx;
-        y += EPS * dy;
-
+        
         int cx = static_cast<int>(std::floor(x / cell_width));
         int cy = static_cast<int>(std::floor(y / cell_width));
 

@@ -140,12 +140,12 @@ void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, 
     for(int y{ 0 }; y < maze.size; ++y) {
         for(int x{ 0 }; x < maze.size; ++x) {
             float cellX{ mazePaddingPx + x * cell_px }, cellY{ mazePaddingPx + y * cell_px };
-            const uint8_t cell{ maze.at(x, y) };
+            const uint8_t cell{ maze.at(x, maze.size - y - 1) };
 
-            ImVec2 wall_tl(tl.x + cellX, tl.y + cellY + cell_px);
-            ImVec2 wall_tr(tl.x + cellX + cell_px, tl.y + cellY + cell_px);
-            ImVec2 wall_bl(tl.x + cellX, tl.y + cellY);
-            ImVec2 wall_br(tl.x + cellX + cell_px, tl.y + cellY);
+            ImVec2 wall_tl(tl.x + cellX, tl.y + cellY);
+            ImVec2 wall_tr(tl.x + cellX + cell_px, tl.y + cellY);
+            ImVec2 wall_bl(tl.x + cellX, tl.y + cellY + cell_px);
+            ImVec2 wall_br(tl.x + cellX + cell_px, tl.y + cellY + cell_px);
 
             if(cell & N) draw_wall(dl, wall_width_px, wall_tl, wall_tr);
             if(cell & E) draw_wall(dl, wall_width_px, wall_br, wall_tr);
