@@ -89,8 +89,8 @@ bool handle_maze_clicks(ImDrawList* dl, const Maze& maze, ImVec2 tl, float side_
 }
 
 void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, float side_px) {
-    pixels_per_meter = side_px / maze.size / cellWidthM;
     cell_px = (side_px - mazePaddingPx * 2.0f) / maze.size;
+    pixels_per_meter = cell_px / cellWidthM;
     wall_width_px = wallWidthM * pixels_per_meter;
 
     handle_maze_clicks(dl, maze, tl, side_px);
@@ -101,7 +101,7 @@ void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, 
     auto world_to_screen = [&](float wx, float wy)
     {
         float x_px = tl.x + mazePaddingPx + wx * pixels_per_meter;
-        float y_px = -mazePaddingPx + tl.y + (16 * cellWidthM - wy) * pixels_per_meter;
+        float y_px = mazePaddingPx + tl.y + (16 * cellWidthM - wy) * pixels_per_meter;
         return ImVec2(x_px, y_px);
     };
 
@@ -158,6 +158,8 @@ void draw_maze(ImDrawList *dl, const Maze &maze, const Mouse &mouse, ImVec2 tl, 
             draw_point(wall_br);
         }
     }
+
+    // draw raycast
     if (mouse.showRaycast) {
         ImVec2 ray_end = {0,0};
         if (mouse.sensorReadings.size() > 0){
