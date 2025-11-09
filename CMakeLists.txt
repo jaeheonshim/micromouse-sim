@@ -5,6 +5,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(msgpack REQUIRED)
+target_link_libraries(micromouse_sim PRIVATE msgpackc-cxx)
+if (WIN32)
+  target_link_libraries(micromouse_sim PRIVATE ws2_32)
+endif()
+
+
 file(GLOB IMGUI_CORE_SRC
     ${CMAKE_SOURCE_DIR}/imgui/imgui.cpp
     ${CMAKE_SOURCE_DIR}/imgui/imgui_draw.cpp
