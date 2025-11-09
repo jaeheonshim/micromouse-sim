@@ -10,7 +10,12 @@ struct Mouse {
   double length{ 0.1 };
   double wheel_radius{ 0.02 };
 
+  bool showRaycast{false}; 
+
   Pose pose{ 0.09, 0.09, M_PI / 2 };
+
+  std::vector<Pose> sensors{{0, 0, 0}};
+  std::vector<Pose> sensorReadings{};
 
   // velocities of the wheels
   double w_l{ 0 };
@@ -24,11 +29,17 @@ struct Mouse {
 
   double get_pos_y() const {
     return pose.y;
-  }
+  } 
 
   double get_heading() const {
     return pose.th;
   }
+
+double get_distance_sensor(size_t sensorNum) const {
+    if (sensorNum >= sensorReadings.size()) return 0.0;
+    const auto& s = sensorReadings[sensorNum];
+    return std::sqrt((s.x - pose.x) * (s.x - pose.x) + (s.y - pose.y) * (s.y - pose.y));
+}
 
   void set_wheels_vel(double w_l, double w_r) {
     this->w_l = w_l;
